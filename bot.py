@@ -1,4 +1,6 @@
 from telegram.ext import Updater, MessageHandler, Filters
+
+import utils
 from utils import search_download_youtube_video
 from loguru import logger
 
@@ -43,6 +45,13 @@ class QuoteBot(Bot):
 
 
 class YoutubeBot(Bot):
+    def _message_handler(self, update, context):
+        self.send_text(update, f'your video is dwnloading:')
+        file_path = utils.search_download_youtube_video(f'{update.message.text}')
+        self.send_video(update, context, file_path)
+
+        def send_video(self, update, context, file_path):
+            context.bot.send_video(chat_id=update.message.chat_id, video=open(file_path, 'rb'), supports_streaming=True)
     pass
 
 
@@ -50,6 +59,6 @@ if __name__ == '__main__':
     with open('.telegramToken') as f:
         _token = f.read()
 
-    my_bot = Bot(_token)
+    my_bot = YoutubeBot(_token)
     my_bot.start()
 
